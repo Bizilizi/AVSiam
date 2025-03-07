@@ -11,14 +11,14 @@ from .pos_embed import get_2d_sincos_pos_embed
 from .gather_layer import GatherLayer
 import torch.distributed.nn
 import torch.distributed as dist
-from ipdb import set_trace
+# from ipdb import set_trace
 from einops import rearrange, repeat
 import copy
 import torch.nn.functional as F
 from collections import OrderedDict
-from tome.merge import bipartite_soft_matching, merge_source, merge_wavg
+# from tome.merge import bipartite_soft_matching, merge_source, merge_wavg
 
-from .yb_tome import yb_bipartite_soft_matching
+# from .yb_tome import yb_bipartite_soft_matching
 
 
 from torch.jit import Final

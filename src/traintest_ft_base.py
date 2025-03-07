@@ -140,9 +140,6 @@ def train(audio_model, train_loader, test_loader, test_sampler, args):
             per_sample_data_time.update((time.time() - end_time) / a_input.shape[0])
             dnn_start_time = time.time()
 
-            audio_output, out_a, out_v = audio_model(a_input, v_input, args.ftmode)
-
-
         
             with autocast():
                 
@@ -159,10 +156,11 @@ def train(audio_model, train_loader, test_loader, test_sampler, args):
                     audio_output = audio_model(a_input, v_input, args.ftmode)
                     loss = loss_fn(audio_output, labels)
 
-            optimizer.zero_grad()
-            scaler.scale(loss).backward()
-            scaler.step(optimizer)
-            scaler.update()
+            scaler.scale(loss).backward()            
+            if (i + 1) % args.accumulate_grad_batches == 0:
+                scaler.step(optimizer)
+                scaler.update()
+                optimizer.zero_grad()
 
             loss_meter.update(loss.item(), B)
             batch_time.update(time.time() - end_time)
@@ -275,7 +273,6 @@ def train(audio_model, train_loader, test_loader, test_sampler, args):
 
         with open(exp_dir + '/stats_' + str(epoch) +'.pickle', 'wb') as handle:
             pickle.dump(stats, handle, protocol=pickle.HIGHEST_PROTOCOL)
-        _save_progress()
 
         finish_time = time.time()
         print('epoch {:d} training time: {:.3f}'.format(epoch, finish_time-begin_time))
